@@ -31,12 +31,8 @@ const override: OverrideEntry = {
 
 describe('compareAuditResults', () => {
 	it('returns safe_to_remove when no CVEs reappear and no new vulns', () => {
-		const baseline = makeAuditResult([
-			makeAdvisory({ source: 100, securityIds: ['CVE-OTHER'] }),
-		])
-		const after = makeAuditResult([
-			makeAdvisory({ source: 100, securityIds: ['CVE-OTHER'] }),
-		])
+		const baseline = makeAuditResult([makeAdvisory({ source: 100, securityIds: ['CVE-OTHER'] })])
+		const after = makeAuditResult([makeAdvisory({ source: 100, securityIds: ['CVE-OTHER'] })])
 
 		const result = compareAuditResults(override, baseline, after)
 		expect(result.verdict).toBe('safe_to_remove')
@@ -46,9 +42,7 @@ describe('compareAuditResults', () => {
 
 	it('returns required when the override CVE reappears', () => {
 		const baseline = makeAuditResult([])
-		const after = makeAuditResult([
-			makeAdvisory({ source: 200, securityIds: ['CVE-2025-15284'] }),
-		])
+		const after = makeAuditResult([makeAdvisory({ source: 200, securityIds: ['CVE-2025-15284'] })])
 
 		const result = compareAuditResults(override, baseline, after)
 		expect(result.verdict).toBe('required')
@@ -99,9 +93,7 @@ describe('findNewAdvisories', () => {
 	})
 
 	it('returns advisories with source IDs not in baseline', () => {
-		const baseline = makeAuditResult([
-			makeAdvisory({ source: 100, securityIds: ['CVE-A'] }),
-		])
+		const baseline = makeAuditResult([makeAdvisory({ source: 100, securityIds: ['CVE-A'] })])
 		const after = makeAuditResult([
 			makeAdvisory({ source: 100, securityIds: ['CVE-A'] }),
 			makeAdvisory({ source: 200, securityIds: ['CVE-B'] }),
@@ -117,17 +109,13 @@ describe('findNewAdvisories', () => {
 			makeAdvisory({ source: 100, securityIds: ['CVE-A'] }),
 			makeAdvisory({ source: 200, securityIds: ['CVE-B'] }),
 		])
-		const after = makeAuditResult([
-			makeAdvisory({ source: 100, securityIds: ['CVE-A'] }),
-		])
+		const after = makeAuditResult([makeAdvisory({ source: 100, securityIds: ['CVE-A'] })])
 
 		expect(findNewAdvisories(baseline, after)).toEqual([])
 	})
 
 	it('uses security IDs as fallback when source is 0', () => {
-		const baseline = makeAuditResult([
-			makeAdvisory({ source: 0, securityIds: ['CVE-KNOWN'] }),
-		])
+		const baseline = makeAuditResult([makeAdvisory({ source: 0, securityIds: ['CVE-KNOWN'] })])
 		const after = makeAuditResult([
 			makeAdvisory({ source: 0, securityIds: ['CVE-KNOWN'] }),
 			makeAdvisory({ source: 0, securityIds: ['CVE-UNKNOWN'] }),

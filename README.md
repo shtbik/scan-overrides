@@ -48,12 +48,15 @@ pnpm add -D scan-overrides
 # Scan all CVE-related overrides
 scan-overrides
 
-# Scan a single override
-scan-overrides --only "semver"
-scan-overrides --only "@vercel/gatsby-plugin-vercel-builder>esbuild"
+# Preview which overrides would be analyzed (no audits)
+scan-overrides --dry
 
-# Scan multiple specific overrides
-scan-overrides --only "semver" --only "qs"
+# Scan a specific override (key must match pnpm.overrides[key] exactly)
+scan-overrides --filter "semver"
+scan-overrides --filter "@vercel/node>esbuild"
+
+# Scan multiple overrides (comma-separated)
+scan-overrides --filter "semver,qs"
 
 # JSON output (for CI pipelines)
 scan-overrides --json
@@ -62,18 +65,19 @@ scan-overrides --json
 scan-overrides --debug
 
 # Combine options
-scan-overrides --only "qs" --debug
+scan-overrides --filter "qs" --debug
 ```
 
 ## Options
 
-| Option         | Description                                       |
-| -------------- | ------------------------------------------------- |
-| `--only <key>` | Only analyze specific override(s). Repeatable.    |
-| `--json`       | Output results as JSON.                           |
-| `--debug`      | Print detailed debug logs to stderr.              |
-| `--cwd <path>` | Project directory (defaults to current directory). |
-| `--help`       | Show usage information.                           |
+| Option            | Description                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `--filter <keys>` | Only analyze specific override(s), comma-separated. Each key must match a `pnpm.overrides` key in `package.json` exactly. |
+| `--dry`           | List overrides that would be analyzed without running audits.                                                             |
+| `--json`          | Output results as JSON.                                                                                                   |
+| `--debug`         | Print detailed debug logs to stderr.                                                                                      |
+| `--cwd <path>`    | Project directory (defaults to current directory).                                                                        |
+| `--help`          | Show usage information.                                                                                                   |
 
 ## Exit codes
 
@@ -87,14 +91,14 @@ scan-overrides --only "qs" --debug
 
 ```typescript
 import { analyze } from 'scan-overrides'
-import type { AnalysisReport } from 'scan-overrides/types'
+import type { AnalysisReport, ProgressCallback } from 'scan-overrides'
 
 const report: AnalysisReport = await analyze('/path/to/project')
 
 for (const result of report.results) {
-  if (result.verdict === 'safe_to_remove') {
-    console.log(`${result.override.key} can be removed`)
-  }
+	if (result.verdict === 'safe_to_remove') {
+		console.log(`${result.override.key} can be removed`)
+	}
 }
 ```
 
@@ -114,17 +118,26 @@ The tool matches security identifiers using these patterns:
 
 ```json
 {
-  "pnpm": {
-    "overrideNotes": {
-      "semver": "Pinned to fix CVE-2024-55565 (ReDoS vulnerability)",
-      "qs": "Fix CVE-2025-15284 (CVSS 7.5) - arrayLimit bypass"
-    },
-    "overrides": {
-      "semver": "^7.7.2",
-      "qs": ">=6.14.2"
-    }
-  }
+	"pnpm": {
+		"overrideNotes": {
+			"semver": "Pinned to fix CVE-2024-55565 (ReDoS vulnerability)",
+			"qs": "Fix CVE-2025-15284 (CVSS 7.5) - arrayLimit bypass",
+			"@vercel/node>esbuild": "Fix CVE-2024-23334 - directory traversal in serve mode"
+		},
+		"overrides": {
+			"semver": "^7.7.2",
+			"qs": ">=6.14.2",
+			"@vercel/node>esbuild": ">=0.25.0"
+		}
+	}
 }
+```
+
+The `--filter` key must match the override key exactly — for scoped/nested
+overrides use the full `parent>child` syntax:
+
+```bash
+scan-overrides --filter "@vercel/node>esbuild"
 ```
 
 ## Limitations

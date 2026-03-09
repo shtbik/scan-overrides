@@ -21,7 +21,7 @@ export type ParseResult = {
 
 export async function parseOverrides(
 	projectDir: string,
-	only: string[] = [],
+	filter: string[] = [],
 ): Promise<ParseResult> {
 	const packageJsonPath = join(projectDir, 'package.json')
 	const content = await readFile(packageJsonPath, 'utf-8')
@@ -43,8 +43,8 @@ export async function parseOverrides(
 			continue
 		}
 
-		if (only.length > 0 && !only.includes(key)) {
-			logger.debug('parse', `Skipping (not in --only list): ${key}`)
+		if (filter.length > 0 && !filter.includes(key)) {
+			logger.debug('parse', `Skipping (not in --filter list): ${key}`)
 			skipped.push({ key, value })
 			continue
 		}

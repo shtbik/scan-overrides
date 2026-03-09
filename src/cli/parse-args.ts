@@ -6,9 +6,10 @@ export function parseArgs(argv: string[]): CliOptions {
 
 	const isJson = args.includes('--json')
 	const isDebug = args.includes('--debug')
+	const isDry = args.includes('--dry')
 
 	let projectDir = process.cwd()
-	const only: string[] = []
+	const filter: string[] = []
 
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i]
@@ -19,8 +20,11 @@ export function parseArgs(argv: string[]): CliOptions {
 			i++
 		}
 
-		if (arg === '--only' && next) {
-			only.push(next)
+		if (arg === '--filter' && next) {
+			for (const key of next.split(',')) {
+				const trimmed = key.trim()
+				if (trimmed) filter.push(trimmed)
+			}
 			i++
 		}
 	}
@@ -29,7 +33,8 @@ export function parseArgs(argv: string[]): CliOptions {
 		projectDir: resolve(projectDir),
 		isJson,
 		isDebug,
-		only,
+		isDry,
+		filter,
 	}
 }
 
@@ -41,12 +46,14 @@ Scans pnpm overrides that reference CVE/GHSA/CWE identifiers and checks
 whether each is still needed by running pnpm audit without it.
 
 Options:
-  --only <key>   Only analyze a specific override (repeatable)
-                 Example: --only "semver" --only "qs"
-                 Example: --only "@vercel/gatsby-plugin-vercel-builder>esbuild"
-  --json         Output results as JSON
-  --debug        Print detailed debug logs to stderr
-  --cwd <path>   Project directory (defaults to cwd)
-  --help         Show this help message
+  --filter <keys>  Only analyze specific override(s), comma-separated. Each key
+                   must match a pnpm.overrides key in package.json exactly.
+                   Example: --filter "semver,qs"
+                   Example: --filter "@vercel/node>esbuild"
+  --dry            List overrides that would be analyzed without running audits
+  --json           Output results as JSON
+  --debug          Print detailed debug logs to stderr
+  --cwd <path>     Project directory (defaults to cwd)
+  --help           Show this help message
 `)
 }

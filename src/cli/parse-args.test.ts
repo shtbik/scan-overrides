@@ -5,7 +5,8 @@ describe('parseArgs', () => {
 		const result = parseArgs(['node', 'index.js'])
 		expect(result.isJson).toBe(false)
 		expect(result.isDebug).toBe(false)
-		expect(result.only).toEqual([])
+		expect(result.isDry).toBe(false)
+		expect(result.filter).toEqual([])
 		expect(result.projectDir).toBe(process.cwd())
 	})
 
@@ -19,24 +20,39 @@ describe('parseArgs', () => {
 		expect(result.isDebug).toBe(true)
 	})
 
-	it('parses a single --only value', () => {
-		const result = parseArgs(['node', 'index.js', '--only', 'semver'])
-		expect(result.only).toEqual(['semver'])
+	it('parses --dry flag', () => {
+		const result = parseArgs(['node', 'index.js', '--dry'])
+		expect(result.isDry).toBe(true)
 	})
 
-	it('parses multiple --only values', () => {
-		const result = parseArgs(['node', 'index.js', '--only', 'semver', '--only', 'qs'])
-		expect(result.only).toEqual(['semver', 'qs'])
+	it('parses a single --filter value', () => {
+		const result = parseArgs(['node', 'index.js', '--filter', 'semver'])
+		expect(result.filter).toEqual(['semver'])
 	})
 
-	it('parses scoped override keys with --only', () => {
+	it('parses comma-separated --filter values', () => {
+		const result = parseArgs(['node', 'index.js', '--filter', 'semver,qs'])
+		expect(result.filter).toEqual(['semver', 'qs'])
+	})
+
+	it('trims whitespace around comma-separated values', () => {
+		const result = parseArgs(['node', 'index.js', '--filter', 'semver , qs'])
+		expect(result.filter).toEqual(['semver', 'qs'])
+	})
+
+	it('ignores empty segments from trailing commas', () => {
+		const result = parseArgs(['node', 'index.js', '--filter', 'semver,'])
+		expect(result.filter).toEqual(['semver'])
+	})
+
+	it('parses scoped nested override keys with --filter', () => {
 		const result = parseArgs([
 			'node',
 			'index.js',
-			'--only',
+			'--filter',
 			'@vercel/gatsby-plugin-vercel-builder>esbuild',
 		])
-		expect(result.only).toEqual(['@vercel/gatsby-plugin-vercel-builder>esbuild'])
+		expect(result.filter).toEqual(['@vercel/gatsby-plugin-vercel-builder>esbuild'])
 	})
 
 	it('parses --cwd and resolves it', () => {
@@ -50,20 +66,22 @@ describe('parseArgs', () => {
 			'index.js',
 			'--json',
 			'--debug',
-			'--only',
-			'qs',
+			'--dry',
+			'--filter',
+			'qs,semver',
 			'--cwd',
 			'/tmp/test',
 		])
 		expect(result.isJson).toBe(true)
 		expect(result.isDebug).toBe(true)
-		expect(result.only).toEqual(['qs'])
+		expect(result.isDry).toBe(true)
+		expect(result.filter).toEqual(['qs', 'semver'])
 		expect(result.projectDir).toBe('/tmp/test')
 	})
 
-	it('ignores --only without a following value at end of args', () => {
-		const result = parseArgs(['node', 'index.js', '--only'])
-		expect(result.only).toEqual([])
+	it('ignores --filter without a following value at end of args', () => {
+		const result = parseArgs(['node', 'index.js', '--filter'])
+		expect(result.filter).toEqual([])
 	})
 
 	it('ignores --cwd without a following value at end of args', () => {

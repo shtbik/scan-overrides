@@ -2,7 +2,8 @@
 import { parseArgs, printUsage } from './cli/parse-args'
 import { logger } from './util/logger'
 import { analyze } from './analyzer/analyze'
-import { printProgress, printReport, printJsonReport } from './report/report'
+import { parseOverrides } from './parser/parse-overrides'
+import { printProgress, printReport, printJsonReport, printDryRun } from './report/report'
 import type { OverrideEntry, OverrideAnalysisResult } from './types'
 
 const options = parseArgs(process.argv)
@@ -17,10 +18,20 @@ if (options.isDebug) {
 }
 
 async function main(): Promise<void> {
+	if (options.isDry) {
+		const { overrides, skipped } = await parseOverrides(options.projectDir, options.filter)
+		if (options.isJson) {
+			console.log(JSON.stringify({ overrides, skipped }, null, 2))
+		} else {
+			printDryRun(overrides, skipped, options.filter)
+		}
+		process.exit(0)
+	}
+
 	if (!options.isJson) {
 		console.log(`\nScanning pnpm overrides in ${options.projectDir}...\n`)
-		if (options.only.length > 0) {
-			console.log(`Filtering to: ${options.only.join(', ')}\n`)
+		if (options.filter.length > 0) {
+			console.log(`Filtering to: ${options.filter.join(', ')}\n`)
 		}
 	}
 
@@ -36,7 +47,7 @@ async function main(): Promise<void> {
 				printProgress(index, total, override.key, phase, result)
 			}
 
-	const report = await analyze(options.projectDir, options.only, onProgress)
+	const report = await analyze(options.projectDir, options.filter, onProgress)
 
 	if (options.isJson) {
 		printJsonReport(report)

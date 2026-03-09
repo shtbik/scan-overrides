@@ -46,7 +46,6 @@ export type CliOptions = {
 	projectDir: string
 	isJson: boolean
 	isDebug: boolean
-	only: string[]
+	isDry: boolean
+	filter: string[]
 }
-
-export type { ProgressCallback } from './analyzer/analyze'

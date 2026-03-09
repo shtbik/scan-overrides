@@ -1,4 +1,4 @@
-import type { AnalysisReport, OverrideAnalysisResult } from '../types'
+import type { AnalysisReport, OverrideAnalysisResult, OverrideEntry } from '../types'
 
 const BOLD = '\x1b[1m'
 const DIM = '\x1b[2m'
@@ -115,16 +115,12 @@ export function printReport(report: AnalysisReport): void {
 
 	if (safeToRemove === 0 && total > 0) {
 		console.log()
-		console.log(
-			`${GREEN}All CVE-related overrides are still required. No cleanup needed.${RESET}`,
-		)
+		console.log(`${GREEN}All CVE-related overrides are still required. No cleanup needed.${RESET}`)
 	}
 }
 
 function printSafeResult(result: OverrideAnalysisResult): void {
-	console.log(
-		`  ${GREEN}•${RESET} ${BOLD}${result.override.key}${RESET}: ${result.override.value}`,
-	)
+	console.log(`  ${GREEN}•${RESET} ${BOLD}${result.override.key}${RESET}: ${result.override.value}`)
 	if (result.override.note) {
 		console.log(`    ${DIM}Note: ${result.override.note}${RESET}`)
 	}
@@ -133,9 +129,7 @@ function printSafeResult(result: OverrideAnalysisResult): void {
 }
 
 function printRequiredResult(result: OverrideAnalysisResult): void {
-	console.log(
-		`  ${BLUE}•${RESET} ${BOLD}${result.override.key}${RESET}: ${result.override.value}`,
-	)
+	console.log(`  ${BLUE}•${RESET} ${BOLD}${result.override.key}${RESET}: ${result.override.value}`)
 	console.log(`    ${DIM}${result.reason}${RESET}`)
 	if (result.resurfacedIds.length > 0) {
 		console.log(`    ${RED}Resurfaced: ${result.resurfacedIds.join(', ')}${RESET}`)
@@ -150,6 +144,39 @@ function printRequiredResult(result: OverrideAnalysisResult): void {
 		}
 	}
 	console.log()
+}
+
+export function printDryRun(
+	overrides: OverrideEntry[],
+	skipped: Array<{ key: string; value: string }>,
+	filter: string[],
+): void {
+	console.log()
+	if (filter.length > 0) {
+		console.log(`${DIM}Filtering to: ${filter.join(', ')}${RESET}`)
+		console.log()
+	}
+
+	if (overrides.length === 0) {
+		console.log('No CVE-related overrides found to analyze.')
+	} else {
+		console.log(`${BOLD}Would analyze ${overrides.length} override(s):${RESET}`)
+		console.log()
+		for (const entry of overrides) {
+			console.log(`  ${GREEN}•${RESET} ${BOLD}${entry.key}${RESET}: ${entry.value}`)
+			console.log(`    ${CYAN}${entry.securityIds.join(', ')}${RESET}`)
+			if (entry.note) {
+				console.log(`    ${DIM}${entry.note}${RESET}`)
+			}
+			console.log()
+		}
+	}
+
+	if (skipped.length > 0) {
+		console.log(
+			`${DIM}Skipped ${skipped.length} override(s) (no CVE/GHSA reference or filtered out)${RESET}`,
+		)
+	}
 }
 
 export function printJsonReport(report: AnalysisReport): void {

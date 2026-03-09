@@ -1,9 +1,4 @@
-import type {
-	AnalysisReport,
-	AuditResult,
-	OverrideAnalysisResult,
-	OverrideEntry,
-} from '../types'
+import type { AnalysisReport, AuditResult, OverrideAnalysisResult, OverrideEntry } from '../types'
 import { parseOverrides } from '../parser/parse-overrides'
 import { pnpmAudit, pnpmInstallLockfileOnly } from '../pnpm/pnpm'
 import { createTempWorkspace, removeOverrideFromPackageJson } from '../workspace/temp-workspace'
@@ -20,12 +15,12 @@ export type ProgressCallback = (
 
 export async function analyze(
 	projectDir: string,
-	only: string[] = [],
+	filter: string[] = [],
 	onProgress?: ProgressCallback,
 ): Promise<AnalysisReport> {
 	const startTime = Date.now()
 
-	const { overrides, skipped } = await parseOverrides(projectDir, only)
+	const { overrides, skipped } = await parseOverrides(projectDir, filter)
 
 	if (overrides.length === 0) {
 		return {
@@ -58,11 +53,8 @@ export async function analyze(
 
 			logger.debug('analyze', `--- Analyzing [${i + 1}/${overrides.length}]: ${override.key} ---`)
 
-			const result = await analyzeSingleOverride(
-				workspace,
-				override,
-				baselineAudit,
-				(phase) => onProgress?.(i, overrides.length, override, phase),
+			const result = await analyzeSingleOverride(workspace, override, baselineAudit, (phase) =>
+				onProgress?.(i, overrides.length, override, phase),
 			)
 
 			logger.debug('analyze', `Verdict: ${result.verdict} — ${result.reason}`)

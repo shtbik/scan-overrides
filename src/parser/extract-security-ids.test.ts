@@ -27,8 +27,7 @@ describe('extractSecurityIds', () => {
 	})
 
 	it('extracts mixed CVE, GHSA, and CWE from one string', () => {
-		const text =
-			'Fix CVE-2026-26960 (GHSA-8qq5-rm4j-mr97) — CWE-22 arbitrary file read/write'
+		const text = 'Fix CVE-2026-26960 (GHSA-8qq5-rm4j-mr97) — CWE-22 arbitrary file read/write'
 		const result = extractSecurityIds(text)
 		expect(result).toContain('CVE-2026-26960')
 		expect(result).toContain('GHSA-8QQ5-RM4J-MR97')

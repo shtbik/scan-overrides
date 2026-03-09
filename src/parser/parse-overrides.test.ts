@@ -16,10 +16,7 @@ function writePackageJson(
 	overrideNotes: Record<string, string> = {},
 ): void {
 	vol.mkdirSync(dir, { recursive: true })
-	vol.writeFileSync(
-		`${dir}/package.json`,
-		JSON.stringify({ pnpm: { overrides, overrideNotes } }),
-	)
+	vol.writeFileSync(`${dir}/package.json`, JSON.stringify({ pnpm: { overrides, overrideNotes } }))
 }
 
 describe('parseOverrides', () => {
@@ -69,7 +66,7 @@ describe('parseOverrides', () => {
 		expect(result.skipped).toHaveLength(1)
 	})
 
-	it('filters to --only keys when provided', async () => {
+	it('filters to --filter keys when provided', async () => {
 		writePackageJson(
 			'/project',
 			{ semver: '^7.7.2', qs: '>=6.14.2' },
