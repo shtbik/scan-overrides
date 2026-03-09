@@ -67,7 +67,6 @@ export function printReport(report: AnalysisReport): void {
 	if (errors > 0) {
 		console.log(`  ${YELLOW}Errors:${RESET}            ${errors}`)
 	}
-	console.log(`  Baseline vulns:      ${baselineVulnCount}`)
 	console.log(`  Duration:            ${formatDuration(duration)}`)
 
 	if (skippedOverrides.length > 0) {
