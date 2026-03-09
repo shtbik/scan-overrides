@@ -26,6 +26,9 @@ For each override that has a security reference (CVE/GHSA/CWE) in
    - If new vulnerabilities appear that weren't in the baseline → **required**
    - If neither → **safe to remove**
 
+Use `--fix` to automatically remove safe-to-remove overrides and their
+`overrideNotes` from `package.json`.
+
 Overrides without a CVE/GHSA/CWE reference in their `overrideNotes` entry are
 skipped — the audit-based approach only applies to security overrides.
 
@@ -45,11 +48,11 @@ pnpm add -D scan-overrides
 ## Usage
 
 ```bash
-# Scan all CVE-related overrides
+# Scan all CVE-related overrides (report only)
 scan-overrides
 
-# Preview which overrides would be analyzed (no audits)
-scan-overrides --dry
+# Scan and remove safe-to-remove overrides from package.json
+scan-overrides --fix
 
 # Scan a specific override (key must match pnpm.overrides[key] exactly)
 scan-overrides --filter "semver"
@@ -73,7 +76,7 @@ scan-overrides --filter "qs" --debug
 | Option            | Description                                                                                                               |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `--filter <keys>` | Only analyze specific override(s), comma-separated. Each key must match a `pnpm.overrides` key in `package.json` exactly. |
-| `--dry`           | List overrides that would be analyzed without running audits.                                                             |
+| `--fix`           | Remove safe-to-remove overrides from `package.json`.                                                                      |
 | `--json`          | Output results as JSON.                                                                                                   |
 | `--debug`         | Print detailed debug logs to stderr.                                                                                      |
 | `--cwd <path>`    | Project directory (defaults to current directory).                                                                        |

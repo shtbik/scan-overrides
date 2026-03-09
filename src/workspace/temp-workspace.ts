@@ -83,3 +83,39 @@ export async function removeOverrideFromPackageJson(
 
 	logger.debug('workspace', `Removed override "${overrideKey}" from package.json`)
 }
+
+export async function removeOverridesFromProject(
+	projectDir: string,
+	keys: string[],
+): Promise<void> {
+	if (keys.length === 0) return
+
+	const packageJsonPath = join(projectDir, 'package.json')
+	const content = await readFile(packageJsonPath, 'utf-8')
+	const packageJson = JSON.parse(content) as Record<string, unknown>
+
+	const pnpm = packageJson.pnpm as Record<string, unknown> | undefined
+	if (!pnpm) return
+
+	const keysToRemove = new Set(keys)
+
+	if (pnpm.overrides && typeof pnpm.overrides === 'object') {
+		const overrides = { ...(pnpm.overrides as Record<string, string>) }
+		for (const key of keysToRemove) delete overrides[key]
+		pnpm.overrides = overrides
+	}
+
+	if (pnpm.overrideNotes && typeof pnpm.overrideNotes === 'object') {
+		const notes = { ...(pnpm.overrideNotes as Record<string, string>) }
+		for (const key of keysToRemove) delete notes[key]
+		pnpm.overrideNotes = notes
+	}
+
+	packageJson.pnpm = pnpm
+
+	const indentMatch = /\n(\s+)"/.exec(content)
+	const indent = indentMatch?.[1] ?? '\t'
+	await writeFile(packageJsonPath, JSON.stringify(packageJson, null, indent) + '\n')
+
+	logger.debug('cleanup', `Removed ${keys.length} override(s) from ${packageJsonPath}`)
+}

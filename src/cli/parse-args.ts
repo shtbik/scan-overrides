@@ -6,7 +6,7 @@ export function parseArgs(argv: string[]): CliOptions {
 
 	const isJson = args.includes('--json')
 	const isDebug = args.includes('--debug')
-	const isDry = args.includes('--dry')
+	const isFix = args.includes('--fix')
 
 	let projectDir = process.cwd()
 	const filter: string[] = []
@@ -33,7 +33,7 @@ export function parseArgs(argv: string[]): CliOptions {
 		projectDir: resolve(projectDir),
 		isJson,
 		isDebug,
-		isDry,
+		isFix,
 		filter,
 	}
 }
@@ -50,7 +50,7 @@ Options:
                    must match a pnpm.overrides key in package.json exactly.
                    Example: --filter "semver,qs"
                    Example: --filter "@vercel/node>esbuild"
-  --dry            List overrides that would be analyzed without running audits
+  --fix            Remove safe-to-remove overrides from package.json
   --json           Output results as JSON
   --debug          Print detailed debug logs to stderr
   --cwd <path>     Project directory (defaults to cwd)

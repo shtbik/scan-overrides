@@ -38,6 +38,7 @@ export type AnalysisReport = {
 	errors: number
 	results: OverrideAnalysisResult[]
 	skippedOverrides: Array<{ key: string; value: string }>
+	removed: string[]
 	duration: number
 	baselineVulnCount: number
 }
@@ -46,6 +47,6 @@ export type CliOptions = {
 	projectDir: string
 	isJson: boolean
 	isDebug: boolean
-	isDry: boolean
+	isFix: boolean
 	filter: string[]
 }

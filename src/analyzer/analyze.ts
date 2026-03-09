@@ -30,6 +30,7 @@ export async function analyze(
 			errors: 0,
 			results: [],
 			skippedOverrides: skipped,
+			removed: [],
 			duration: Date.now() - startTime,
 			baselineVulnCount: 0,
 		}
@@ -69,6 +70,7 @@ export async function analyze(
 			errors: results.filter((r) => r.verdict === 'error').length,
 			results,
 			skippedOverrides: skipped,
+			removed: [],
 			duration: Date.now() - startTime,
 			baselineVulnCount: baselineAudit.vulnerabilityCount,
 		}

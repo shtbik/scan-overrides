@@ -2,8 +2,8 @@
 import { parseArgs, printUsage } from './cli/parse-args'
 import { logger } from './util/logger'
 import { analyze } from './analyzer/analyze'
-import { parseOverrides } from './parser/parse-overrides'
-import { printProgress, printReport, printJsonReport, printDryRun } from './report/report'
+import { removeOverridesFromProject } from './workspace/temp-workspace'
+import { printProgress, printReport, printJsonReport } from './report/report'
 import type { OverrideEntry, OverrideAnalysisResult } from './types'
 
 const options = parseArgs(process.argv)
@@ -18,16 +18,6 @@ if (options.isDebug) {
 }
 
 async function main(): Promise<void> {
-	if (options.isDry) {
-		const { overrides, skipped } = await parseOverrides(options.projectDir, options.filter)
-		if (options.isJson) {
-			console.log(JSON.stringify({ overrides, skipped }, null, 2))
-		} else {
-			printDryRun(overrides, skipped, options.filter)
-		}
-		process.exit(0)
-	}
-
 	if (!options.isJson) {
 		console.log(`\nScanning pnpm overrides in ${options.projectDir}...\n`)
 		if (options.filter.length > 0) {
@@ -48,6 +38,15 @@ async function main(): Promise<void> {
 			}
 
 	const report = await analyze(options.projectDir, options.filter, onProgress)
+
+	const safeKeys = report.results
+		.filter((r) => r.verdict === 'safe_to_remove')
+		.map((r) => r.override.key)
+
+	if (safeKeys.length > 0 && options.isFix) {
+		await removeOverridesFromProject(options.projectDir, safeKeys)
+		report.removed = safeKeys
+	}
 
 	if (options.isJson) {
 		printJsonReport(report)

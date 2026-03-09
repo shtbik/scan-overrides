@@ -5,7 +5,7 @@ describe('parseArgs', () => {
 		const result = parseArgs(['node', 'index.js'])
 		expect(result.isJson).toBe(false)
 		expect(result.isDebug).toBe(false)
-		expect(result.isDry).toBe(false)
+		expect(result.isFix).toBe(false)
 		expect(result.filter).toEqual([])
 		expect(result.projectDir).toBe(process.cwd())
 	})
@@ -20,9 +20,9 @@ describe('parseArgs', () => {
 		expect(result.isDebug).toBe(true)
 	})
 
-	it('parses --dry flag', () => {
-		const result = parseArgs(['node', 'index.js', '--dry'])
-		expect(result.isDry).toBe(true)
+	it('parses --fix flag', () => {
+		const result = parseArgs(['node', 'index.js', '--fix'])
+		expect(result.isFix).toBe(true)
 	})
 
 	it('parses a single --filter value', () => {
@@ -66,7 +66,7 @@ describe('parseArgs', () => {
 			'index.js',
 			'--json',
 			'--debug',
-			'--dry',
+			'--fix',
 			'--filter',
 			'qs,semver',
 			'--cwd',
@@ -74,7 +74,7 @@ describe('parseArgs', () => {
 		])
 		expect(result.isJson).toBe(true)
 		expect(result.isDebug).toBe(true)
-		expect(result.isDry).toBe(true)
+		expect(result.isFix).toBe(true)
 		expect(result.filter).toEqual(['qs', 'semver'])
 		expect(result.projectDir).toBe('/tmp/test')
 	})
