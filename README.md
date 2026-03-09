@@ -36,10 +36,10 @@ Overrides without a CVE/GHSA/CWE reference in their `overrideNotes` entry are
 
 ```bash
 # Run directly
-npx scan-overrides
+pnpx scan-overrides
 
 # Or install globally
-npm install -g scan-overrides
+pnpm install -g scan-overrides
 
 # Or add as a devDependency
 pnpm add -D scan-overrides
