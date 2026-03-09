@@ -1,0 +1,54 @@
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Git tag to publish (e.g. v0.1.0)"
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - name: Derive version from tag
+        run: |
+          VERSION="${{ inputs.tag }}"
+          VERSION="${VERSION#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Publishing version: $VERSION"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Set package version
+        run: npm version "$VERSION" --no-git-tag-version
+
+      - name: Publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
