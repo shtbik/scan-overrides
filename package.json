@@ -1,7 +1,7 @@
 {
 	"name": "scan-overrides",
 	"version": "0.1.0",
-	"description": "CLI tool that scans pnpm overrides and determines whether CVE-related overrides can be safely removed by running pnpm audit",
+	"description": "CLI tool that scans package.json overrides and determines whether CVE-related overrides can be safely removed by running pnpm audit",
 	"bin": {
 		"scan-overrides": "dist/index.js"
 	},
