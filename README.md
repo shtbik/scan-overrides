@@ -119,7 +119,7 @@ The tool matches security identifiers using these patterns:
 
 ## Example `package.json` setup
 
-```json
+```jsonc
 {
 	"pnpm": {
 		"overrideNotes": {
