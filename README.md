@@ -121,22 +121,22 @@ The tool matches security identifiers using these patterns:
 
 ```jsonc
 {
-	"pnpm": {
-		"overrideNotes": {
-			"semver": "Pinned to fix CVE-2024-55565 (ReDoS vulnerability)",
-			"qs": "Fix CVE-2025-15284 (CVSS 7.5) - arrayLimit bypass",
-			"@vercel/node>esbuild": "Fix CVE-2024-23334 - directory traversal in serve mode",
-			"@vercel/fun@1.2>tar": "Scoped override to fix GHSA-8qq5-rm4j-mr97 - Arbitrary file read/write via hardlink target escape through symlink chain",
+  "pnpm": {
+    "overrideNotes": {
+      "semver": "Pinned to fix CVE-2024-55565 (ReDoS vulnerability)",
+      "qs": "Fix CVE-2025-15284 (CVSS 7.5) - arrayLimit bypass",
+      "@vercel/node>esbuild": "Fix CVE-2024-23334 - directory traversal in serve mode",
+      "@vercel/fun@1.2>tar": "Scoped override to fix GHSA-8qq5-rm4j-mr97 - Arbitrary file read/write via hardlink target escape through symlink chain",
       "recharts>react-is": "Pinned to current React version for R19 compatibility - recharts v2 needs this version to properly introspect React 19 elements"
-		},
-		"overrides": {
-			"semver": "^7.7.2",
-			"qs": ">=6.14.2",
-			"@vercel/node>esbuild": ">=0.25.0",
-			"@vercel/fun@1.2>tar": "^7.5.8",
+    },
+    "overrides": {
+      "semver": "^7.7.2",
+      "qs": ">=6.14.2",
+      "@vercel/node>esbuild": ">=0.25.0",
+      "@vercel/fun@1.2>tar": "^7.5.8",
       "recharts>react-is": "^19.1.1" // skipped as it has no CVE reference in overrideNotes
-		}
-	}
+    }
+  }
 }
 ```
 
